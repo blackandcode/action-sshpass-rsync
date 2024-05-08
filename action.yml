@@ -23,6 +23,10 @@ inputs:
   extra:
     description: 'Extra switches to add to rsync'
     required: false
+  baseswiches:
+    description: 'Default switches to add to rsync'
+    required: false
+    default: '-avrhz'
   remote:
     description: 'Remote destination'
     required: false
@@ -49,6 +53,7 @@ runs:
     KEY: ${{ inputs.key }}
     LOCAL: ${{ inputs.local }}
     EXTRA: ${{ inputs.extra }}
+    BASESWICHES: ${{ inputs.baseswiches }}
     REMOTE: ${{ inputs.remote }}
     RUNBEFORE: ${{ inputs.runBeforeDeployment }}
     RUNAFTER: ${{ inputs.runAfterDeployment }}

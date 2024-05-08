@@ -5,16 +5,17 @@ echo "#################################################"
 echo "> Starting ${GITHUB_WORKFLOW}:${GITHUB_ACTION}"
 
 # Available env
-# echo "INPUT_HOST: ${INPUT_HOST}"
-# echo "INPUT_PORT: ${INPUT_PORT}"
-# echo "INPUT_USER: ${INPUT_USER}"
-# echo "INPUT_PASS: ${INPUT_PASS}"
-# echo "INPUT_KEY: ${INPUT_KEY}"
-# echo "INPUT_LOCAL: ${INPUT_LOCAL}"
-# echo "INPUT_EXTRA: ${INPUT_EXTRA}"
-# echo "INPUT_REMOTE: ${INPUT_REMOTE}"
-# echo "INPUT_RUN_BEFORE: ${INPUT_RUNBEFORE}"
-# echo "INPUT_RUN_AFTER: ${INPUT_RUNAFTER}"
+echo "INPUT_HOST: ${INPUT_HOST}"
+echo "INPUT_PORT: ${INPUT_PORT}"
+echo "INPUT_USER: ${INPUT_USER}"
+#echo "INPUT_PASS: ${INPUT_PASS}"
+echo "INPUT_KEY: ${INPUT_KEY}"
+echo "INPUT_LOCAL: ${INPUT_LOCAL}"
+echo "INPUT_EXTRA: ${INPUT_EXTRA}"
+echo "INPUT_BASESWICHES: ${INPUT_BASESWICHES}"
+echo "INPUT_REMOTE: ${INPUT_REMOTE}"
+echo "INPUT_RUN_BEFORE: ${INPUT_RUNBEFORE}"
+echo "INPUT_RUN_AFTER: ${INPUT_RUNAFTER}"
 
 RUNBEFORE="${INPUT_RUNBEFORE/$'\n'/' && '}"
 RUNAFTER="${INPUT_RUNAFTER/$'\n'/' && '}"
@@ -33,10 +34,12 @@ then # Password
   echo "> Deploying now"
   if [ -z "$INPUT_EXTRA" ]
   then
-    sh -c "sshpass -p $INPUT_PASS rsync -avhz --progress --stats -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
+    echo "sshpass -p $INPUT_PASS rsync $INPUT_BASESWICHES --progress --stats -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
+    sh -c "sshpass -p $INPUT_PASS rsync $INPUT_BASESWICHES --progress --stats -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
   else
     EXTRA="$INPUT_EXTRA"
-    sh -c "sshpass -p $INPUT_PASS rsync -avhz $EXTRA --progress --stats -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
+    echo "sshpass -p $INPUT_PASS rsync $INPUT_BASESWICHES $EXTRA -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
+    sh -c "sshpass -p $INPUT_PASS rsync $INPUT_BASESWICHES $EXTRA -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
   fi
 
   [[ -z "${INPUT_RUNAFTER}" ]] && {
