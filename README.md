@@ -6,7 +6,7 @@ in order to enable deployments on hosts, which don't support key based ssh
 ## Usage
 ```yml
 - name: Deploy to Server
-  uses: mai-space/action-sshpass-rsync@v1
+  uses: blackandcode/action-sshpass-rsync/@v3.0.0
   with:
     host: ${{ secrets.DEPLOY_HOST }}
     user: ${{ secrets.DEPLOY_USER }}
@@ -14,6 +14,7 @@ in order to enable deployments on hosts, which don't support key based ssh
     pass: ${{ secrets.DEPLOY_PASS }}
     local: "path/of/your/local/mashine"
     extra: "--your extra params for rsync"
+    baseswiches: "-vrhz"
     remote: "path/where/to/deploy/to"
     runBeforeDeployment: |
       cd somewhere/
@@ -32,7 +33,7 @@ Feel free to contribute.
 
 ```yml
 - name: Deploy to Server
-  uses: mai-space/action-sshpass-rsync@v1
+  uses: blackandcode/action-sshpass-rsync/@v3.0.0
   with:
     host: ${{ secrets.DEPLOY_HOST }}
     user: ${{ secrets.DEPLOY_USER }}
@@ -40,6 +41,7 @@ Feel free to contribute.
     key: ${{ secrets.PRIVATE_KEY }}
     local: "path/of/your/local/mashine"
     extra: "--your extra params for rsync"
+    baseswiches: "-vrhz"
     remote: "path/where/to/deploy/to"
     runBeforeDeployment: |
       cd somewhere/
