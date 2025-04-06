@@ -22,32 +22,29 @@ RUNAFTER="${INPUT_RUNAFTER/$'\n'/' && '}"
 
 if [ -z "$INPUT_KEY" ]
 then # Password
-  echo "> Exporting Password"
-  export SSHPASS=$PASS
-
+  echo "> Using printf to handle special characters in password"
+  
   [[ -z "${INPUT_RUNBEFORE}" ]] && {
     echo "> Executing commands before deployment"
-    sshpass -e ssh -o StrictHostKeyChecking=no -p $INPUT_PORT $INPUT_USER@$INPUT_HOST "$RUNBEFORE"
+    printf '%s\n' "$INPUT_PASS" | sshpass -p "$(cat)" ssh -o StrictHostKeyChecking=no -p $INPUT_PORT $INPUT_USER@$INPUT_HOST "$RUNBEFORE"
   }
-
 
   echo "> Deploying now"
   if [ -z "$INPUT_EXTRA" ]
   then
-    echo "sshpass -p $INPUT_PASS rsync $INPUT_BASESWICHES --progress --stats -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
-    sh -c "sshpass -p $INPUT_PASS rsync $INPUT_BASESWICHES --progress --stats -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
+    echo "Executing rsync with base switches"
+    printf '%s\n' "$INPUT_PASS" | sh -c "sshpass -p \"$(cat)\" rsync $INPUT_BASESWICHES --progress --stats -e 'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
   else
     EXTRA="$INPUT_EXTRA"
-    echo "sshpass -p $INPUT_PASS rsync $INPUT_BASESWICHES $EXTRA -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
-    sh -c "sshpass -p $INPUT_PASS rsync $INPUT_BASESWICHES $EXTRA -e  'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
+    echo "Executing rsync with base switches and extra options"
+    printf '%s\n' "$INPUT_PASS" | sh -c "sshpass -p \"$(cat)\" rsync $INPUT_BASESWICHES $EXTRA -e 'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
   fi
 
   [[ -z "${INPUT_RUNAFTER}" ]] && {
     echo "> Executing commands after deployment"
-    sshpass -e ssh -o StrictHostKeyChecking=no -p $INPUT_PORT $INPUT_USER@$INPUT_HOST "$RUNAFTER"
+    printf '%s\n' "$INPUT_PASS" | sshpass -p "$(cat)" ssh -o StrictHostKeyChecking=no -p $INPUT_PORT $INPUT_USER@$INPUT_HOST "$RUNAFTER"
   }
-
-
+  
 else # Private key
   pwd
   mkdir "/root/.ssh"
@@ -71,19 +68,19 @@ else # Private key
   echo "> Deploying now"
   if [ -z "$INPUT_EXTRA" ]
   then
-    EXTRA="$INPUT_EXTRA"
-    sh -c "sshpass -e rsync -avhz --progress --stats -e 'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
+    echo "Executing rsync with base switches"
+    sh -c "sshpass -e rsync $INPUT_BASESWICHES --progress --stats -e 'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
   else
-    sh -c "sshpass -e rsync -avhz --progress $EXTRA --stats -e 'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
+    EXTRA="$INPUT_EXTRA"
+    echo "Executing rsync with base switches and extra options"
+    sh -c "sshpass -e rsync $INPUT_BASESWICHES $EXTRA -e 'ssh -p $INPUT_PORT' $GITHUB_WORKSPACE/$INPUT_LOCAL $INPUT_USER@$INPUT_HOST:$INPUT_REMOTE"
   fi
-
 
   [[ -z "${INPUT_RUNAFTER}" ]] && {
     echo "> Executing commands after deployment"
     sshpass -e ssh -o StrictHostKeyChecking=no -p $INPUT_PORT $INPUT_USER@$INPUT_HOST "$RUNAFTER"
   }
 fi
-
 
 echo "#################################################"
 echo "Completed ${GITHUB_WORKFLOW}:${GITHUB_ACTION}"
